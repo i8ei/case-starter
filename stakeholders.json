@@ -1,0 +1,23 @@
+[
+  {
+    "name": "行政機関A",
+    "role": "制度解釈・許認可の確認",
+    "type": "external",
+    "importance": "critical",
+    "status": "照会中"
+  },
+  {
+    "name": "外部専門家B",
+    "role": "技術的助言",
+    "type": "external",
+    "importance": "high",
+    "status": "相談済み"
+  },
+  {
+    "name": "内部関係者C",
+    "role": "合意形成・意思決定",
+    "type": "internal",
+    "importance": "critical",
+    "status": "説明準備中"
+  }
+]

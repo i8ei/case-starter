@@ -1,0 +1,21 @@
+{
+  "id": "sample-case",
+  "title": "サンプル案件",
+  "status": "initial_review",
+  "phase": "fact_gathering",
+  "summary": "案件の概要をここに書く。何を、誰のために、なぜ動かしているかを一文で。",
+  "current_blockers": [
+    "上位判断の未確定事項がある"
+  ],
+  "next_actions": [
+    "関係者Aへ確認の連絡",
+    "不明点をquestionsに追加"
+  ],
+  "critical_path": [
+    "上流論点の確定",
+    "スキーム確定",
+    "関係者合意",
+    "実行"
+  ],
+  "updated_at": "2026-03-30"
+}

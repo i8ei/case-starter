@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>サンプル案件</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 40px; color: #222; line-height: 1.6; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px 18px; }
+    h1,h2,h3 { margin-top: 0; }
+    .pill { display:inline-block; border:1px solid #bbb; border-radius:999px; padding:2px 10px; margin-right:8px; font-size: 14px; }
+    .critical { font-weight: 700; }
+    code { background:#f6f6f6; padding:2px 5px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <h1>サンプル案件</h1>
+  <p>案件の概要をここに書く。何を、誰のために、なぜ動かしているかを一文で。</p>
+  <p><span class="pill">status: initial_review</span><span class="pill">phase: fact_gathering</span><span class="pill">updated_at: 2026-03-30</span></p>
+
+  <div class="grid">
+    <section class="card">
+      <h2>現在の blocker</h2>
+      <ul><li class="critical">上位判断の未確定事項がある</li></ul>
+      <h3>次アクション</h3>
+      <ul><li>関係者Aへ確認の連絡</li>
+<li>不明点をquestionsに追加</li></ul>
+    </section>
+
+    <section class="card">
+      <h2>クリティカルパス</h2>
+      <ol><li>上流論点の確定</li>
+<li>スキーム確定</li>
+<li>関係者合意</li>
+<li>実行</li></ol>
+    </section>
+
+    <section class="card">
+      <h2>関係者</h2>
+      <ul><li><strong>行政機関A</strong> — 制度解釈・許認可の確認 <code>critical</code> / 照会中</li>
+<li><strong>外部専門家B</strong> — 技術的助言 <code>high</code> / 相談済み</li>
+<li><strong>内部関係者C</strong> — 合意形成・意思決定 <code>critical</code> / 説明準備中</li></ul>
+    </section>
+
+    <section class="card">
+      <h2>未解決 questions</h2>
+      <ul><li><strong>Q1</strong> このスキームは制度上認められるか<br><small>owner: 行政機関A / priority: critical / status: open</small></li>
+<li><strong>Q2</strong> 実務上の手続きに支障はあるか<br><small>owner: 外部専門家B / priority: high / status: pending</small></li></ul>
+    </section>
+
+    <section class="card">
+      <h2>tasks</h2>
+      <ul><li><strong>T1</strong> 行政機関Aへ進捗確認の連絡<br><small>status: next / due: 2026-04-04</small></li>
+<li><strong>T2</strong> 回答内容の記録整理<br><small>status: blocked</small></li>
+<li><strong>T3</strong> 関係者向け説明文の作成<br><small>status: in_progress</small></li></ul>
+    </section>
+
+    <section class="card">
+      <h2>decisions</h2>
+      <ul><li><strong>D1</strong> 上流論点の確定を最優先にする<br><small>2026-03-30 / ここが未確定のまま進めると後工程が無駄になる可能性があるため</small></li></ul>
+    </section>
+  </div>
+</body>
+</html>
