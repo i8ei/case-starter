@@ -4,20 +4,23 @@
     "role": "制度解釈・許認可の確認",
     "type": "external",
     "importance": "critical",
-    "status": "照会中"
+    "status": "照会中",
+    "contact": "担当者名 / 電話番号 / メールアドレス"
   },
   {
     "name": "外部専門家B",
     "role": "技術的助言",
     "type": "external",
     "importance": "high",
-    "status": "相談済み"
+    "status": "相談済み",
+    "contact": ""
   },
   {
     "name": "内部関係者C",
     "role": "合意形成・意思決定",
     "type": "internal",
     "importance": "critical",
-    "status": "説明準備中"
+    "status": "説明準備中",
+    "contact": ""
   }
 ]

@@ -12,5 +12,13 @@
     "owner": "外部専門家B",
     "priority": "high",
     "status": "pending"
+  },
+  {
+    "id": "Q3",
+    "question": "（解決済みの例）この手続きに期限はあるか",
+    "owner": "行政機関A",
+    "priority": "high",
+    "status": "resolved",
+    "resolution": "期限なし。ただし年度内完了が望ましいと回答あり（2026-03-30）"
   }
 ]

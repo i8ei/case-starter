@@ -1,0 +1,38 @@
+[
+  {
+    "id": "fact_gathering",
+    "label": "事実確認",
+    "description": "案件の全体像と関係者を把握する段階",
+    "next": ["external_inquiry"]
+  },
+  {
+    "id": "external_inquiry",
+    "label": "外部照会中",
+    "description": "行政・専門家への確認を行っている段階",
+    "next": ["scheme_design"]
+  },
+  {
+    "id": "scheme_design",
+    "label": "スキーム設計",
+    "description": "照会結果をもとに進め方を確定する段階",
+    "next": ["consensus_building"]
+  },
+  {
+    "id": "consensus_building",
+    "label": "合意形成",
+    "description": "関係者への説明・同意取得を行う段階",
+    "next": ["execution"]
+  },
+  {
+    "id": "execution",
+    "label": "実行",
+    "description": "登記・申告・手続きを実施する段階",
+    "next": ["closed"]
+  },
+  {
+    "id": "closed",
+    "label": "完了",
+    "description": "案件クローズ",
+    "next": []
+  }
+]

@@ -4,18 +4,21 @@
     "title": "行政機関Aへ進捗確認の連絡",
     "status": "next",
     "depends_on": [],
-    "due": "2026-04-04"
+    "due": "2026-04-04",
+    "notes": "担当者名・連絡先はstakeholders.json参照"
   },
   {
     "id": "T2",
     "title": "回答内容の記録整理",
     "status": "blocked",
-    "depends_on": ["T1"]
+    "depends_on": ["T1"],
+    "notes": ""
   },
   {
     "id": "T3",
     "title": "関係者向け説明文の作成",
     "status": "in_progress",
-    "depends_on": []
+    "depends_on": [],
+    "notes": ""
   }
 ]

@@ -2,63 +2,732 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>サンプル案件</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 40px; color: #222; line-height: 1.6; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px 18px; }
-    h1,h2,h3 { margin-top: 0; }
-    .pill { display:inline-block; border:1px solid #bbb; border-radius:999px; padding:2px 10px; margin-right:8px; font-size: 14px; }
-    .critical { font-weight: 700; }
-    code { background:#f6f6f6; padding:2px 5px; border-radius:6px; }
+    :root {
+      --page-bg: #f5f5f5;
+      --surface: #ffffff;
+      --surface-muted: #f8f9ff;
+      --ink: #111827;
+      --ink-soft: #4b5563;
+      --ink-faint: #9ca3af;
+      --header-bg: #1a1a2e;
+      --blue: #0070f3;
+      --blue-soft: #eff6ff;
+      --red: #cc0000;
+      --red-deep: #6e1111;
+      --red-soft: #fff0f0;
+      --green-deep: #14532d;
+      --green-soft: #e8f7ed;
+      --amber: #f59e0b;
+      --amber-soft: #fffbf0;
+      --line: #d6d9e3;
+      --radius: 18px;
+      --shadow: 0 14px 30px rgba(17, 24, 39, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .header-bar {
+      background: var(--header-bg);
+      color: #fff;
+      padding: 28px 32px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .header-copy h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .phase-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(0, 112, 243, 0.18);
+      color: #dcecff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .updated-at {
+      color: #a6adc8;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .status-banner {
+      padding: 18px 24px;
+      border-radius: var(--radius);
+      font-size: clamp(20px, 2.2vw, 30px);
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      box-shadow: var(--shadow);
+    }
+
+    .status-banner.alert {
+      background: var(--red-deep);
+      color: #fff;
+    }
+
+    .status-banner.ok {
+      background: var(--green-deep);
+      color: #fff;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 4fr 3fr 3fr;
+      gap: 18px;
+      min-height: 40vh;
+    }
+
+    .hero-panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .hero-panel h2,
+    .section-title {
+      margin: 0 0 16px;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .today-panel {
+      background: #f8f9ff;
+      border-left: 4px solid var(--blue);
+    }
+
+    .today-list,
+    .mini-list,
+    .stakeholder-list,
+    .logs-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .today-list li,
+    .mini-list li {
+      font-size: 16px;
+      line-height: 1.8;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(214, 217, 227, 0.9);
+    }
+
+    .today-list li:last-child,
+    .mini-list li:last-child,
+    .stakeholder-list li:last-child,
+    .logs-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .subhead {
+      margin: 20px 0 8px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .blocker-card {
+      background: var(--red-soft);
+      border-left: 4px solid var(--red);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+
+    .blocker-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .question-panel {
+      background: var(--amber-soft);
+      border-left: 4px solid var(--amber);
+    }
+
+    .question-card {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+
+    .question-card:last-child { margin-bottom: 0; }
+
+    .question-owner {
+      display: block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #7c5a10;
+      font-weight: 700;
+    }
+
+    .timeline {
+      padding: 24px;
+    }
+
+    .critical-path-wrap {
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .critical-path-track {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      min-width: max-content;
+    }
+
+    .critical-step {
+      position: relative;
+      padding: 16px 42px 16px 0;
+      min-width: 190px;
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    .critical-step::after {
+      content: '';
+      position: absolute;
+      top: 27px;
+      right: 14px;
+      width: 18px;
+      height: 2px;
+      background: var(--line);
+    }
+
+    .critical-step:last-child::after { display: none; }
+
+    .step-dot {
+      display: inline-block;
+      margin-right: 8px;
+      font-size: 18px;
+      vertical-align: middle;
+    }
+
+    .critical-step.done {
+      color: var(--ink-faint);
+      text-decoration: line-through;
+      font-size: 12px;
+    }
+
+    .critical-step.current {
+      background: var(--blue-soft);
+      border-radius: 14px;
+      padding: 18px 42px 18px 18px;
+      color: var(--ink);
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .critical-step.current .step-dot {
+      color: var(--blue);
+      font-size: 22px;
+    }
+
+    .critical-step.future .step-dot,
+    .critical-step.done .step-dot {
+      color: #9ca3af;
+    }
+
+    .lower-grid {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 18px;
+    }
+
+    .section-body {
+      padding: 24px;
+    }
+
+    .task-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .task-table th,
+    .task-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .task-table th {
+      color: var(--ink-soft);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .group-row td {
+      padding-top: 20px;
+      padding-bottom: 10px;
+      border-bottom: 0;
+      font-size: 12px;
+      color: var(--ink-soft);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .task-id {
+      width: 80px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .task-title {
+      font-weight: 700;
+    }
+
+    .task-meta {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .task-row.done {
+      opacity: 0.55;
+    }
+
+    .task-row.done .task-title {
+      text-decoration: line-through;
+    }
+
+    .status-badge,
+    .due-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-badge.info {
+      background: #e8f1ff;
+      color: #0f4fbf;
+    }
+
+    .status-badge.danger {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .status-badge.warning {
+      background: #fff6df;
+      color: #a16207;
+    }
+
+    .status-badge.success {
+      background: var(--green-soft);
+      color: var(--green-deep);
+    }
+
+    .status-badge.neutral {
+      background: #eceff4;
+      color: #4b5563;
+    }
+
+    .due-badge {
+      margin-left: 8px;
+    }
+
+    .due-badge.soon {
+      background: #fff6df;
+      color: #a16207;
+    }
+
+    .due-badge.overdue {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .stakeholder-list li,
+    .logs-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stakeholder-list strong.critical {
+      font-weight: 800;
+    }
+
+    .stakeholder-role,
+    .stakeholder-status,
+    .log-file {
+      display: block;
+      font-size: 13px;
+      color: var(--ink-soft);
+    }
+
+    details.panel {
+      padding: 0;
+    }
+
+    details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 22px 24px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    details summary::-webkit-details-marker { display: none; }
+
+    .details-body {
+      padding: 0 24px 24px;
+    }
+
+    .decisions-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .decisions-table th,
+    .decisions-table td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .decisions-table th {
+      color: var(--ink-soft);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .empty-state {
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .page { padding: 14px; }
+      .header-bar,
+      .hero,
+      .lower-grid {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+      .header-bar {
+        align-items: flex-start;
+        padding: 22px 20px;
+      }
+      .hero {
+        min-height: auto;
+      }
+      .hero-panel,
+      .section-body,
+      .timeline,
+      details summary,
+      .details-body {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+      .critical-path-track {
+        display: grid;
+        min-width: 0;
+      }
+      .critical-step {
+        min-width: 0;
+        padding: 10px 0 10px 0;
+      }
+      .critical-step.current {
+        padding: 14px;
+      }
+      .critical-step::after {
+        display: none;
+      }
+      .task-table,
+      .decisions-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page {
+        max-width: none;
+        padding: 0;
+      }
+      .panel,
+      .hero-panel,
+      .status-banner {
+        box-shadow: none;
+      }
+      .hero,
+      .lower-grid {
+        grid-template-columns: 1fr;
+      }
+      .critical-path-wrap {
+        overflow: visible;
+      }
+      .critical-path-track {
+        display: block;
+        min-width: 0;
+      }
+      .critical-step,
+      .critical-step.current {
+        display: block;
+        min-width: 0;
+        padding: 8px 0;
+        background: transparent;
+      }
+      .critical-step::after {
+        display: none;
+      }
+      details {
+        display: block;
+      }
+      details > summary {
+        display: none;
+      }
+      details > .details-body {
+        display: block !important;
+        padding-top: 0;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>サンプル案件</h1>
-  <p>案件の概要をここに書く。何を、誰のために、なぜ動かしているかを一文で。</p>
-  <p><span class="pill">status: initial_review</span><span class="pill">phase: fact_gathering</span><span class="pill">updated_at: 2026-03-30</span></p>
+  <div class="page">
+    <div class="stack">
+      <header class="panel header-bar">
+        <div class="header-copy">
+          <h1>サンプル案件</h1>
+          <div class="header-meta">
+            <span class="phase-badge">fact_gathering</span>
+            <span class="updated-at">Updated 2026-03-30</span>
+          </div>
+        </div>
+      </header>
 
-  <div class="grid">
-    <section class="card">
-      <h2>現在の blocker</h2>
-      <ul><li class="critical">上位判断の未確定事項がある</li></ul>
-      <h3>次アクション</h3>
-      <ul><li>関係者Aへ確認の連絡</li>
+      <section class="status-banner alert">⚠️ 1件のBlockerがあります — 前進できていません</section>
+
+      <section class="hero">
+        <div class="hero-panel today-panel">
+          <h2>今日やること</h2>
+          <ul class="today-list"><li>関係者Aへ確認の連絡</li>
 <li>不明点をquestionsに追加</li></ul>
-    </section>
+          <div class="subhead">next タスク</div>
+          <ul class="mini-list"><li><strong>T1</strong> 行政機関Aへ進捗確認の連絡</li></ul>
+        </div>
 
-    <section class="card">
-      <h2>クリティカルパス</h2>
-      <ol><li>上流論点の確定</li>
-<li>スキーム確定</li>
-<li>関係者合意</li>
-<li>実行</li></ol>
-    </section>
+        <div class="hero-panel">
+          <h2>止まっている理由</h2>
+          <div class="blocker-card"><span class="blocker-label">🚫 Blocker</span>上位判断の未確定事項がある</div>
+        </div>
 
-    <section class="card">
-      <h2>関係者</h2>
-      <ul><li><strong>行政機関A</strong> — 制度解釈・許認可の確認 <code>critical</code> / 照会中</li>
-<li><strong>外部専門家B</strong> — 技術的助言 <code>high</code> / 相談済み</li>
-<li><strong>内部関係者C</strong> — 合意形成・意思決定 <code>critical</code> / 説明準備中</li></ul>
-    </section>
+        <div class="hero-panel question-panel">
+          <h2>次の判断</h2>
+          <div class="subhead">❓ 未解決の問い</div>
+          
+              <div class="question-card">
+                <div>このスキームは制度上認められるか</div>
+                <span class="question-owner">Owner: 行政機関A</span>
+              </div>
+        </div>
+      </section>
 
-    <section class="card">
-      <h2>未解決 questions</h2>
-      <ul><li><strong>Q1</strong> このスキームは制度上認められるか<br><small>owner: 行政機関A / priority: critical / status: open</small></li>
-<li><strong>Q2</strong> 実務上の手続きに支障はあるか<br><small>owner: 外部専門家B / priority: high / status: pending</small></li></ul>
-    </section>
+      <section class="panel timeline">
+        <h2 class="section-title">クリティカルパス</h2>
+        <div class="critical-path-wrap">
+          <div class="critical-path-track">
+            <div class="critical-step current"><span class="step-dot">●</span>上流論点の確定</div>
+<div class="critical-step future"><span class="step-dot">○</span>スキーム確定</div>
+<div class="critical-step future"><span class="step-dot">○</span>関係者合意</div>
+<div class="critical-step future"><span class="step-dot">○</span>実行</div>
+          </div>
+        </div>
+      </section>
 
-    <section class="card">
-      <h2>tasks</h2>
-      <ul><li><strong>T1</strong> 行政機関Aへ進捗確認の連絡<br><small>status: next / due: 2026-04-04</small></li>
-<li><strong>T2</strong> 回答内容の記録整理<br><small>status: blocked</small></li>
-<li><strong>T3</strong> 関係者向け説明文の作成<br><small>status: in_progress</small></li></ul>
-    </section>
+      <section class="lower-grid">
+        <section class="panel">
+          <div class="section-body">
+            <h2 class="section-title">タスク一覧</h2>
+            <table class="task-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>内容</th>
+                  <th>状態</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+                    <tr class="group-row">
+                      <td colspan="3">着手 / 進行中</td>
+                    </tr>
+                    
+                      <tr class="task-row next">
+                        <td class="task-id">T1</td>
+                        <td>
+                          <div class="task-title">行政機関Aへ進捗確認の連絡</div>
+                          
+                          <div class="task-meta">due: 2026-04-04 <span class="due-badge soon">あと5日</span></div>
+                        </td>
+                        <td><span class="status-badge info">→ 次にやる</span></td>
+                      </tr>
 
-    <section class="card">
-      <h2>decisions</h2>
-      <ul><li><strong>D1</strong> 上流論点の確定を最優先にする<br><small>2026-03-30 / ここが未確定のまま進めると後工程が無駄になる可能性があるため</small></li></ul>
-    </section>
+                      <tr class="task-row in_progress">
+                        <td class="task-id">T3</td>
+                        <td>
+                          <div class="task-title">関係者向け説明文の作成</div>
+                          
+                          
+                        </td>
+                        <td><span class="status-badge info">🔄 進行中</span></td>
+                      </tr>
+                  
+
+                    <tr class="group-row">
+                      <td colspan="3">Block中</td>
+                    </tr>
+                    
+                      <tr class="task-row blocked">
+                        <td class="task-id">T2</td>
+                        <td>
+                          <div class="task-title">回答内容の記録整理</div>
+                          <div class="task-meta">depends_on: T1</div>
+                          
+                        </td>
+                        <td><span class="status-badge danger">🚫 Block中</span></td>
+                      </tr>
+                  
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside class="side-stack">
+          <section class="panel">
+            <div class="section-body">
+              <h2 class="section-title">関係者</h2>
+              <ul class="stakeholder-list">
+                  <li>
+                    <strong class="critical">行政機関A</strong>
+                    <span class="stakeholder-role">制度解釈・許認可の確認</span>
+                    <span class="stakeholder-status">最重要 / 照会中</span>
+                  </li>
+
+                  <li>
+                    <strong class="critical">内部関係者C</strong>
+                    <span class="stakeholder-role">合意形成・意思決定</span>
+                    <span class="stakeholder-status">最重要 / 説明準備中</span>
+                  </li>
+
+                  <li>
+                    <strong class="">外部専門家B</strong>
+                    <span class="stakeholder-role">技術的助言</span>
+                    <span class="stakeholder-status">高 / 相談済み</span>
+                  </li></ul>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-body">
+              <h2 class="section-title">Recent logs</h2>
+              <ul class="logs-list">
+                  <li>
+                    <a href="logs/2026-03-30-example.md">2026-03-30 関係者Aとの電話メモ</a>
+                    <span class="log-file">2026-03-30-example.md</span>
+                  </li></ul>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <details class="panel">
+        <summary>意思決定の履歴 (1件)</summary>
+        <div class="details-body">
+          <table class="decisions-table">
+            <thead>
+              <tr>
+                <th>date</th>
+                <th>title</th>
+                <th>reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>2026-03-30</td>
+                  <td>上流論点の確定を最優先にする</td>
+                  <td>ここが未確定のまま進めると後工程が無駄になる可能性があるため</td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
   </div>
 </body>
 </html>
