@@ -813,7 +813,7 @@ const html = `<!doctype html>
       </section>
 
       <section class="panel timeline">
-        <h2 class="section-title">クリティカルパス</h2>
+        <h2 class="section-title">道筋</h2>
         <div class="critical-path-wrap">
           <div class="critical-path-track">
             ${joinHtml(caseData.critical_path, (step, index) => {
