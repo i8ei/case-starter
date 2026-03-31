@@ -95,3 +95,4 @@ phases.json に有効なフェーズと遷移先が定義されている。
 - `npm run build`
 - `npm run check`
 - `npm run init -- --title "案件名" --id case-slug`
+- `npm run new-log -- --title "記録タイトル" --type note --slug short-name`

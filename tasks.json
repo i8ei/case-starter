@@ -17,7 +17,7 @@
     "depends_on": ["T1"],
     "notes": "",
     "owner": "内部関係者C",
-    "source_log": "",
+    "source_log": "logs/2026-03-30-example.md",
     "updated_at": "2026-03-30"
   },
   {

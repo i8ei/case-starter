@@ -8,6 +8,10 @@ function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+function fileExists(relativePath) {
+  return fs.existsSync(path.join(rootDir, relativePath));
+}
+
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -26,6 +30,28 @@ function isStringArray(value) {
 
 function isIsoDate(value) {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function validateSourceLog(prefix, item, report, required = false) {
+  if (!isOptionalString(item.source_log)) {
+    report.error(`${prefix}.source_log must be a string when present.`);
+    return;
+  }
+
+  if (!item.source_log) {
+    if (required) {
+      report.warn(`${prefix}.source_log is empty.`);
+    }
+    return;
+  }
+
+  if (!item.source_log.startsWith('logs/')) {
+    report.warn(`${prefix}.source_log should use a logs/ relative path.`);
+  }
+
+  if (!fileExists(item.source_log)) {
+    report.warn(`${prefix}.source_log "${item.source_log}" does not exist.`);
+  }
 }
 
 function loadCaseFiles() {
@@ -207,7 +233,7 @@ function validateQuestions(questions, report) {
       report.error(`${prefix}.resolution is required when status is resolved.`);
     }
 
-    ['resolution', 'notes', 'source_log', 'updated_at'].forEach(key => {
+    ['resolution', 'notes', 'updated_at'].forEach(key => {
       if (!isOptionalString(question[key])) {
         report.error(`${prefix}.${key} must be a string when present.`);
       }
@@ -216,6 +242,8 @@ function validateQuestions(questions, report) {
     if (typeof question.updated_at === 'string' && !isIsoDate(question.updated_at)) {
       report.error(`${prefix}.updated_at must use YYYY-MM-DD format when present.`);
     }
+
+    validateSourceLog(prefix, question, report, question.status === 'resolved' || question.status === 'in_progress');
   });
 
   return ids;
@@ -253,7 +281,7 @@ function validateTasks(tasks, report) {
       report.error(`${prefix}.depends_on must be an array of strings.`);
     }
 
-    ['due', 'notes', 'owner', 'source_log', 'updated_at'].forEach(key => {
+    ['due', 'notes', 'owner', 'updated_at'].forEach(key => {
       if (!isOptionalString(task[key])) {
         report.error(`${prefix}.${key} must be a string when present.`);
       }
@@ -266,6 +294,8 @@ function validateTasks(tasks, report) {
     if (typeof task.updated_at === 'string' && !isIsoDate(task.updated_at)) {
       report.error(`${prefix}.updated_at must use YYYY-MM-DD format when present.`);
     }
+
+    validateSourceLog(prefix, task, report, task.status !== 'next');
   });
 
   return ids;
@@ -294,7 +324,7 @@ function validateDecisions(decisions, questionIds, report) {
       ids.add(decision.id);
     }
 
-    ['date', 'from_question', 'source_log', 'updated_at'].forEach(key => {
+    ['date', 'from_question', 'updated_at'].forEach(key => {
       if (!isOptionalString(decision[key])) {
         report.error(`${prefix}.${key} must be a string or null when present.`);
       }
@@ -311,6 +341,8 @@ function validateDecisions(decisions, questionIds, report) {
     if (isNonEmptyString(decision.from_question) && !questionIds.has(decision.from_question)) {
       report.error(`${prefix}.from_question "${decision.from_question}" is not defined in questions.json.`);
     }
+
+    validateSourceLog(prefix, decision, report, true);
   });
 }
 

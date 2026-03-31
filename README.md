@@ -52,11 +52,17 @@ npm run build
 npm run check
 ```
 
+新しい素材を入れるときは、先にログの雛形を作る。
+
+```bash
+npm run new-log -- --title "関係者Aとの電話" --type call --slug agency-call
+```
+
 ## 典型的な運用フロー
 
-1. `questions.json` に「分からないこと」を問いとして切る
-2. `tasks.json` に「今やる行動」を書く
-3. 連絡や会話が発生したら、まず `logs/` に一次記録を残す
+1. 連絡や会話が発生したら、まず `logs/` に一次記録を残す
+2. `questions.json` に「分からないこと」を問いとして切る
+3. `tasks.json` に「今やる行動」を書く
 4. 記録をもとに `questions`、`tasks`、`decisions`、`case` を更新する
 5. `npm run check` で整合性を確認し、ダッシュボードを再生成する
 6. Git にコミットして状態を固定する
@@ -71,6 +77,8 @@ npm run check
   `public/index.html` を再生成する
 - `npm run check`
   `validate` と `build` をまとめて実行する
+- `npm run new-log -- --title "記録タイトル"`
+  `logs/` に標準的な記録テンプレートを生成する
 
 ## 何を検証するか
 
@@ -106,10 +114,12 @@ case-starter/
 3. `decisions` には結論だけでなく理由も残す
 4. `logs` は加工前の一次記録として扱う
 5. ダッシュボードは編集せず、必ず JSON から再生成する
+6. `questions / tasks / decisions` は、可能な限り `source_log` を持たせる
 
 ## AI セッション運用
 
 AI セッション開始時の読み順や更新ルールは [CLAUDE.md](CLAUDE.md) にまとめています。
+入力素材から更新差分を作る流れは [docs/update-workflow.md](docs/update-workflow.md) にまとめています。
 
 想定している基本の流れ:
 

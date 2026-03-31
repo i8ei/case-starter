@@ -7,6 +7,7 @@
     "build": "node scripts/build-dashboard.js",
     "validate": "node scripts/validate-case.js",
     "check": "npm run validate && npm run build",
-    "init": "node scripts/init-case.js"
+    "init": "node scripts/init-case.js",
+    "new-log": "node scripts/new-log.js"
   }
 }

@@ -135,7 +135,7 @@ function main() {
   if (!fs.existsSync(logPath)) {
     writeText(
       path.relative(rootDir, logPath),
-      `# ${title} キックオフメモ\n\n- このログは初期サンプルです\n- 初回ヒアリング内容や現状認識を書き換えて使ってください\n`
+      `---\ndate: ${currentDate}\ntype: note\nsource: kickoff\nparticipants: \n---\n\n# ${title} キックオフメモ\n\n## Summary\n- このログは初期サンプルです\n- 初回ヒアリング内容や現状認識を書き換えて使ってください\n\n## Raw notes\n- \n\n## Candidate updates\n- New questions:\n- Resolved questions:\n- New tasks:\n- Updated tasks:\n- New decisions:\n- Case updates:\n- No change:\n`
     );
   }
 
