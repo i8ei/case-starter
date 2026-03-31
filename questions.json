@@ -4,14 +4,20 @@
     "question": "このスキームは制度上認められるか",
     "owner": "行政機関A",
     "priority": "critical",
-    "status": "open"
+    "status": "open",
+    "notes": "最上流論点。ここが決まらないと後続が動かない",
+    "source_log": "logs/2026-03-30-example.md",
+    "updated_at": "2026-03-30"
   },
   {
     "id": "Q2",
     "question": "実務上の手続きに支障はあるか",
     "owner": "外部専門家B",
     "priority": "high",
-    "status": "pending"
+    "status": "pending",
+    "notes": "",
+    "source_log": "",
+    "updated_at": "2026-03-30"
   },
   {
     "id": "Q3",
@@ -19,6 +25,9 @@
     "owner": "行政機関A",
     "priority": "high",
     "status": "resolved",
-    "resolution": "期限なし。ただし年度内完了が望ましいと回答あり（2026-03-30）"
+    "resolution": "期限なし。ただし年度内完了が望ましいと回答あり（2026-03-30）",
+    "notes": "",
+    "source_log": "logs/2026-03-30-example.md",
+    "updated_at": "2026-03-30"
   }
 ]

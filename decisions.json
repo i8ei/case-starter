@@ -4,6 +4,8 @@
     "date": "2026-03-30",
     "title": "上流論点の確定を最優先にする",
     "reason": "ここが未確定のまま進めると後工程が無駄になる可能性があるため",
-    "from_question": "Q1"
+    "from_question": "Q1",
+    "source_log": "logs/2026-03-30-example.md",
+    "updated_at": "2026-03-30"
   }
 ]

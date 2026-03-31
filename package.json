@@ -1,0 +1,12 @@
+{
+  "name": "case-starter",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AIと人間が共有できる案件管理テンプレート",
+  "scripts": {
+    "build": "node scripts/build-dashboard.js",
+    "validate": "node scripts/validate-case.js",
+    "check": "npm run validate && npm run build",
+    "init": "node scripts/init-case.js"
+  }
+}

@@ -5,20 +5,29 @@
     "status": "next",
     "depends_on": [],
     "due": "2026-04-04",
-    "notes": "担当者名・連絡先はstakeholders.json参照"
+    "notes": "担当者名・連絡先はstakeholders.json参照",
+    "owner": "内部関係者C",
+    "source_log": "logs/2026-03-30-example.md",
+    "updated_at": "2026-03-30"
   },
   {
     "id": "T2",
     "title": "回答内容の記録整理",
     "status": "blocked",
     "depends_on": ["T1"],
-    "notes": ""
+    "notes": "",
+    "owner": "内部関係者C",
+    "source_log": "",
+    "updated_at": "2026-03-30"
   },
   {
     "id": "T3",
     "title": "関係者向け説明文の作成",
     "status": "in_progress",
     "depends_on": [],
-    "notes": ""
+    "notes": "",
+    "owner": "内部関係者C",
+    "source_log": "logs/2026-03-30-example.md",
+    "updated_at": "2026-03-30"
   }
 ]

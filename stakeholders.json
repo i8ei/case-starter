@@ -5,7 +5,8 @@
     "type": "external",
     "importance": "critical",
     "status": "照会中",
-    "contact": "担当者名 / 電話番号 / メールアドレス"
+    "contact": "担当者名 / 電話番号 / メールアドレス",
+    "notes": "上流の解釈確認を担う相手"
   },
   {
     "name": "外部専門家B",
@@ -13,7 +14,8 @@
     "type": "external",
     "importance": "high",
     "status": "相談済み",
-    "contact": ""
+    "contact": "",
+    "notes": ""
   },
   {
     "name": "内部関係者C",
@@ -21,6 +23,7 @@
     "type": "internal",
     "importance": "critical",
     "status": "説明準備中",
-    "contact": ""
+    "contact": "",
+    "notes": "説明順序や根回しの主担当"
   }
 ]

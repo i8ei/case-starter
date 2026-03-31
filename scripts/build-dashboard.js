@@ -37,11 +37,34 @@ function firstLine(filePath) {
   return content.split(/\r?\n/, 1)[0] || '';
 }
 
+function countByStatus(items) {
+  return items.reduce((counts, item) => {
+    counts[item.status] = (counts[item.status] || 0) + 1;
+    return counts;
+  }, {});
+}
+
+function renderListOrEmpty(items, mapper, emptyText, className = '') {
+  if (!items.length) {
+    return `<div class="empty-state">${escapeHtml(emptyText)}</div>`;
+  }
+  const classes = className ? ` class="${className}"` : '';
+  return `<ul${classes}>${joinHtml(items, mapper)}</ul>`;
+}
+
 const caseData = readJson('case.json');
+const phases = readJson('phases.json');
 const stakeholders = readJson('stakeholders.json');
 const questions = readJson('questions.json');
 const tasks = readJson('tasks.json');
 const decisions = readJson('decisions.json');
+
+const phaseById = new Map(phases.map(phase => [phase.id, phase]));
+const phase = phaseById.get(caseData.phase);
+const taskIdSet = new Set(tasks.map(task => task.id));
+const questionIdSet = new Set(questions.map(question => question.id));
+const taskCounts = countByStatus(tasks);
+const questionCounts = countByStatus(questions);
 
 const statusLabels = {
   waiting_external_response: '⏳ 外部回答待ち',
@@ -106,17 +129,18 @@ function renderDueWarning(due) {
   return '';
 }
 
-function renderListOrEmpty(items, mapper, emptyText, className = '') {
-  if (!items.length) {
-    return `<div class="empty-state">${escapeHtml(emptyText)}</div>`;
-  }
-  const classes = className ? ` class="${className}"` : '';
-  return `<ul${classes}>${joinHtml(items, mapper)}</ul>`;
+function renderMetricCard(label, value, tone = 'neutral') {
+  return `
+    <div class="metric-card ${tone}">
+      <span class="metric-label">${escapeHtml(label)}</span>
+      <strong class="metric-value">${escapeHtml(value)}</strong>
+    </div>
+  `;
 }
 
 const logsDir = path.join(__dirname, '..', 'logs');
 const latestLogs = fs.readdirSync(logsDir)
-  .filter(f => f.endsWith('.md'))
+  .filter(file => file.endsWith('.md'))
   .sort()
   .reverse()
   .slice(0, 3)
@@ -131,7 +155,9 @@ const bannerHtml = blockerCount > 0
   : '✅ 順調に進行中';
 const bannerClass = blockerCount > 0 ? 'alert' : 'ok';
 
-const criticalQuestions = questions.filter(q => q.priority === 'critical' && (q.status === 'open' || q.status === 'pending'));
+const criticalQuestions = questions.filter(
+  question => question.priority === 'critical' && (question.status === 'open' || question.status === 'pending')
+);
 const nextTasks = tasks.filter(task => task.status === 'next');
 
 const taskGroupOrder = {
@@ -199,6 +225,42 @@ const sortedStakeholders = [...stakeholders].sort((a, b) => {
   }
   return a.name.localeCompare(b.name, 'ja');
 });
+
+const dataWarnings = [];
+
+if (!phase) {
+  dataWarnings.push(`case.json.phase "${caseData.phase}" が phases.json にありません`);
+}
+
+if (
+  !Number.isInteger(caseData.critical_path_current_index) ||
+  caseData.critical_path_current_index < 0 ||
+  caseData.critical_path_current_index >= caseData.critical_path.length
+) {
+  dataWarnings.push('critical_path_current_index が道筋の範囲外です');
+}
+
+tasks.forEach(task => {
+  if (task.status === 'blocked' && (!task.depends_on || task.depends_on.length === 0)) {
+    dataWarnings.push(`${task.id} は blocked ですが depends_on が空です`);
+  }
+
+  (task.depends_on || []).forEach(dependsOnId => {
+    if (!taskIdSet.has(dependsOnId)) {
+      dataWarnings.push(`${task.id} が存在しない task "${dependsOnId}" を参照しています`);
+    }
+  });
+});
+
+decisions.forEach(decision => {
+  if (decision.from_question && !questionIdSet.has(decision.from_question)) {
+    dataWarnings.push(`${decision.id} が存在しない question "${decision.from_question}" を参照しています`);
+  }
+});
+
+const phaseText = phase
+  ? `${phase.label} (${phase.id})`
+  : caseData.phase;
 
 const html = `<!doctype html>
 <html lang="ja">
@@ -276,6 +338,13 @@ const html = `<!doctype html>
       letter-spacing: 0.02em;
     }
 
+    .summary-text {
+      margin: 12px 0 0;
+      color: #d7dcf0;
+      max-width: 760px;
+      font-size: 15px;
+    }
+
     .header-meta {
       display: flex;
       align-items: center;
@@ -318,6 +387,69 @@ const html = `<!doctype html>
     .status-banner.ok {
       background: var(--green-deep);
       color: #fff;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 22px;
+    }
+
+    .metric-card.info {
+      background: var(--blue-soft);
+    }
+
+    .metric-card.warning {
+      background: var(--amber-soft);
+    }
+
+    .metric-card.danger {
+      background: var(--red-soft);
+    }
+
+    .metric-label {
+      display: block;
+      font-size: 12px;
+      color: var(--ink-soft);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .metric-value {
+      display: block;
+      margin-top: 8px;
+      font-size: 28px;
+      line-height: 1.1;
+    }
+
+    .warnings-panel {
+      padding: 20px 22px;
+      border-left: 4px solid var(--amber);
+      background: var(--amber-soft);
+    }
+
+    .warning-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .warning-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+      font-size: 14px;
+    }
+
+    .warning-list li:last-child {
+      border-bottom: 0;
     }
 
     .hero {
@@ -674,7 +806,8 @@ const html = `<!doctype html>
       .page { padding: 14px; }
       .header-bar,
       .hero,
-      .lower-grid {
+      .lower-grid,
+      .metrics-grid {
         grid-template-columns: 1fr;
         display: grid;
       }
@@ -689,7 +822,8 @@ const html = `<!doctype html>
       .section-body,
       .timeline,
       details summary,
-      .details-body {
+      .details-body,
+      .warnings-panel {
         padding-left: 18px;
         padding-right: 18px;
       }
@@ -722,11 +856,13 @@ const html = `<!doctype html>
       }
       .panel,
       .hero-panel,
-      .status-banner {
+      .status-banner,
+      .metric-card {
         box-shadow: none;
       }
       .hero,
-      .lower-grid {
+      .lower-grid,
+      .metrics-grid {
         grid-template-columns: 1fr;
       }
       .critical-path-wrap {
@@ -765,14 +901,31 @@ const html = `<!doctype html>
       <header class="panel header-bar">
         <div class="header-copy">
           <h1>${escapeHtml(caseData.title)}</h1>
+          <p class="summary-text">${escapeHtml(caseData.summary)}</p>
           <div class="header-meta">
-            <span class="phase-badge">${escapeHtml(caseData.phase)}</span>
+            <span class="phase-badge">${escapeHtml(phaseText)}</span>
             <span class="updated-at">Updated ${escapeHtml(caseData.updated_at)}</span>
           </div>
         </div>
       </header>
 
       <section class="status-banner ${bannerClass}">${escapeHtml(bannerHtml)}</section>
+
+      <section class="metrics-grid">
+        ${renderMetricCard('Open Questions', `${questionCounts.open || 0}件`, 'warning')}
+        ${renderMetricCard('Next / In Progress', `${(taskCounts.next || 0) + (taskCounts.in_progress || 0)}件`, 'info')}
+        ${renderMetricCard('Blocked Tasks', `${taskCounts.blocked || 0}件`, blockerCount > 0 ? 'danger' : 'neutral')}
+        ${renderMetricCard('Decisions', `${decisions.length}件`, 'neutral')}
+      </section>
+
+      ${dataWarnings.length
+        ? `<section class="panel warnings-panel">
+            <h2 class="section-title">Data checks</h2>
+            <ul class="warning-list">
+              ${joinHtml(dataWarnings, warning => `<li>${escapeHtml(warning)}</li>`)}
+            </ul>
+          </section>`
+        : ''}
 
       <section class="hero">
         <div class="hero-panel today-panel">
@@ -853,6 +1006,7 @@ const html = `<!doctype html>
                         <td class="task-id">${escapeHtml(task.id)}</td>
                         <td>
                           <div class="task-title">${escapeHtml(task.title)}</div>
+                          ${task.owner ? `<div class="task-meta">owner: ${escapeHtml(task.owner)}</div>` : ''}
                           ${task.status === 'blocked' && task.depends_on && task.depends_on.length
                             ? `<div class="task-meta">depends_on: ${escapeHtml(task.depends_on.join(', '))}</div>`
                             : ''}
