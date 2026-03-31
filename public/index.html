@@ -106,23 +106,23 @@
       white-space: nowrap;
     }
 
-    .status-banner {
-      padding: 18px 24px;
-      border-radius: var(--radius);
-      font-size: clamp(20px, 2.2vw, 30px);
+    .status-strip {
+      padding: 18px 22px;
+      border-left: 4px solid var(--line);
+    }
+
+    .status-main {
+      font-size: 14px;
       font-weight: 800;
-      letter-spacing: 0.01em;
-      box-shadow: var(--shadow);
+      color: var(--ink);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
-    .status-banner.alert {
-      background: var(--red-deep);
-      color: #fff;
-    }
-
-    .status-banner.ok {
-      background: var(--green-deep);
-      color: #fff;
+    .status-sub {
+      margin-top: 6px;
+      font-size: 14px;
+      color: var(--ink-soft);
     }
 
     .metrics-grid {
@@ -645,7 +645,10 @@
         </div>
       </header>
 
-      <section class="status-banner alert">⚠️ 1件のBlockerがあります — 前進できていません</section>
+      <section class="panel status-strip">
+        <div class="status-main">📋 初期調査中 / blocker 1件</div>
+        <div class="status-sub">現在の primary blocker はありません。</div>
+      </section>
 
       <section class="metrics-grid">
         
@@ -737,7 +740,7 @@
                           <div class="task-title">行政機関Aへ進捗確認の連絡</div>
                           <div class="task-meta">owner: 内部関係者C</div>
                           
-                          <div class="task-meta">due: 2026-04-04 <span class="due-badge soon">あと4日</span></div>
+                          <div class="task-meta">due: 2026-04-04 <span class="due-badge soon">あと3日</span></div>
                         </td>
                         <td><span class="status-badge info">→ 次にやる</span></td>
                       </tr>

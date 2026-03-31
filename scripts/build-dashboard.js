@@ -150,10 +150,12 @@ const latestLogs = fs.readdirSync(logsDir)
   });
 
 const blockerCount = caseData.current_blockers.length;
-const bannerHtml = blockerCount > 0
-  ? `⚠️ ${blockerCount}件のBlockerがあります — 前進できていません`
-  : '✅ 順調に進行中';
-const bannerClass = blockerCount > 0 ? 'alert' : 'ok';
+const statusSummary = blockerCount > 0
+  ? `${formatStatus(caseData.status)} / blocker ${blockerCount}件`
+  : formatStatus(caseData.status);
+const statusDetail = caseData.primary_blocker
+  ? `Primary blocker: ${caseData.primary_blocker}`
+  : '現在の primary blocker はありません。';
 
 const criticalQuestions = questions.filter(
   question => question.priority === 'critical' && (question.status === 'open' || question.status === 'pending')
@@ -370,23 +372,23 @@ const html = `<!doctype html>
       white-space: nowrap;
     }
 
-    .status-banner {
-      padding: 18px 24px;
-      border-radius: var(--radius);
-      font-size: clamp(20px, 2.2vw, 30px);
+    .status-strip {
+      padding: 18px 22px;
+      border-left: 4px solid var(--line);
+    }
+
+    .status-main {
+      font-size: 14px;
       font-weight: 800;
-      letter-spacing: 0.01em;
-      box-shadow: var(--shadow);
+      color: var(--ink);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
-    .status-banner.alert {
-      background: var(--red-deep);
-      color: #fff;
-    }
-
-    .status-banner.ok {
-      background: var(--green-deep);
-      color: #fff;
+    .status-sub {
+      margin-top: 6px;
+      font-size: 14px;
+      color: var(--ink-soft);
     }
 
     .metrics-grid {
@@ -909,7 +911,10 @@ const html = `<!doctype html>
         </div>
       </header>
 
-      <section class="status-banner ${bannerClass}">${escapeHtml(bannerHtml)}</section>
+      <section class="panel status-strip">
+        <div class="status-main">${escapeHtml(statusSummary)}</div>
+        <div class="status-sub">${escapeHtml(statusDetail)}</div>
+      </section>
 
       <section class="metrics-grid">
         ${renderMetricCard('Open Questions', `${questionCounts.open || 0}件`, 'warning')}
