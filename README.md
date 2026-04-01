@@ -88,6 +88,7 @@ npm run new-log -- --title "関係者Aとの電話" --type call --slug agency-ca
 - `tasks.depends_on` が存在する task を参照しているか
 - `decisions.from_question` が存在する question を参照しているか
 - `critical_path_current_index` が範囲内か
+- `case.json.current_blockers` / `next_actions` / `primary_blocker` に書いた `T-*` `Q-*` 参照が、現在の task / question 状態と食い違っていないか
 
 ## リポジトリ構成
 
@@ -115,6 +116,18 @@ case-starter/
 4. `logs` は加工前の一次記録として扱う
 5. ダッシュボードは編集せず、必ず JSON から再生成する
 6. `questions / tasks / decisions` は、可能な限り `source_log` を持たせる
+7. 外部ノートを併用する場合でも、案件の正本は repo 内の JSON に置く
+
+## 外部ノート併用
+
+Obsidian などの外部ノートを併用してもよいですが、役割を分けた方が運用が安定します。
+
+- repo 内 JSON: 現在地の正本
+- `logs/`: 一次記録の正本
+- 外部ノート: 時系列の補助メモ、検討メモ、説明文の叩き台
+
+外部ノートは、古いメモを毎回全面更新するより、日付付きで追記していく時系列ログとして使う方が安全です。
+再開時に迷わないよう、外部ノート側にも「読む入口」を1枚置いておく運用を推奨します。
 
 ## AI セッション運用
 

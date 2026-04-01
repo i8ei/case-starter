@@ -52,6 +52,78 @@ function renderListOrEmpty(items, mapper, emptyText, className = '') {
   return `<ul${classes}>${joinHtml(items, mapper)}</ul>`;
 }
 
+function unique(values) {
+  return [...new Set(values)];
+}
+
+function extractCaseRefs(value) {
+  if (typeof value !== 'string') {
+    return [];
+  }
+
+  return unique(value.match(/\b(?:T-[A-Za-z0-9-]+|Q-[A-Za-z0-9-]+)\b/g) || []);
+}
+
+function pushCaseReferenceWarnings(target, caseData, taskMap, questionMap) {
+  const groups = [
+    {
+      field: 'case.json.primary_blocker',
+      values: typeof caseData.primary_blocker === 'string' ? [caseData.primary_blocker] : [],
+      mode: 'blocker'
+    },
+    {
+      field: 'case.json.current_blockers',
+      values: Array.isArray(caseData.current_blockers) ? caseData.current_blockers : [],
+      mode: 'blocker'
+    },
+    {
+      field: 'case.json.next_actions',
+      values: Array.isArray(caseData.next_actions) ? caseData.next_actions : [],
+      mode: 'next_action'
+    }
+  ];
+
+  groups.forEach(group => {
+    group.values.forEach((value, index) => {
+      const prefix = group.field === 'case.json.primary_blocker'
+        ? group.field
+        : `${group.field}[${index}]`;
+
+      extractCaseRefs(value).forEach(ref => {
+        if (ref.startsWith('T-')) {
+          const task = taskMap.get(ref);
+
+          if (!task) {
+            target.push(`${prefix} が存在しない task "${ref}" を参照しています`);
+            return;
+          }
+
+          if (task.status === 'done') {
+            target.push(`${prefix} が完了済み task "${ref}" を参照しています`);
+          }
+
+          if (group.mode === 'next_action' && task.status === 'blocked') {
+            target.push(`${prefix} が blocked task "${ref}" を参照しています`);
+          }
+
+          return;
+        }
+
+        const question = questionMap.get(ref);
+
+        if (!question) {
+          target.push(`${prefix} が存在しない question "${ref}" を参照しています`);
+          return;
+        }
+
+        if (question.status === 'resolved') {
+          target.push(`${prefix} が解決済み question "${ref}" を参照しています`);
+        }
+      });
+    });
+  });
+}
+
 const caseData = readJson('case.json');
 const phases = readJson('phases.json');
 const stakeholders = readJson('stakeholders.json');
@@ -63,6 +135,8 @@ const phaseById = new Map(phases.map(phase => [phase.id, phase]));
 const phase = phaseById.get(caseData.phase);
 const taskIdSet = new Set(tasks.map(task => task.id));
 const questionIdSet = new Set(questions.map(question => question.id));
+const taskById = new Map(tasks.map(task => [task.id, task]));
+const questionById = new Map(questions.map(question => [question.id, question]));
 const taskCounts = countByStatus(tasks);
 const questionCounts = countByStatus(questions);
 
@@ -259,6 +333,8 @@ decisions.forEach(decision => {
     dataWarnings.push(`${decision.id} が存在しない question "${decision.from_question}" を参照しています`);
   }
 });
+
+pushCaseReferenceWarnings(dataWarnings, caseData, taskById, questionById);
 
 const phaseText = phase
   ? `${phase.label} (${phase.id})`

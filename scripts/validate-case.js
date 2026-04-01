@@ -32,6 +32,30 @@ function isIsoDate(value) {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
+function unique(values) {
+  return [...new Set(values)];
+}
+
+function extractCaseRefs(value) {
+  if (typeof value !== 'string') {
+    return [];
+  }
+
+  return unique(value.match(/\b(?:T-[A-Za-z0-9-]+|Q-[A-Za-z0-9-]+)\b/g) || []);
+}
+
+function buildIdMap(items) {
+  const map = new Map();
+
+  items.forEach(item => {
+    if (isPlainObject(item) && isNonEmptyString(item.id)) {
+      map.set(item.id, item);
+    }
+  });
+
+  return map;
+}
+
 function validateSourceLog(prefix, item, report, required = false) {
   if (!isOptionalString(item.source_log)) {
     report.error(`${prefix}.source_log must be a string when present.`);
@@ -408,6 +432,74 @@ function validateCrossReferences(tasks, taskIds, report) {
   });
 }
 
+function validateCaseReferenceConsistency(caseData, taskMap, questionMap, report) {
+  const groups = [
+    {
+      field: 'case.json.primary_blocker',
+      values: typeof caseData.primary_blocker === 'string' ? [caseData.primary_blocker] : [],
+      mode: 'blocker'
+    },
+    {
+      field: 'case.json.current_blockers',
+      values: Array.isArray(caseData.current_blockers) ? caseData.current_blockers : [],
+      mode: 'blocker'
+    },
+    {
+      field: 'case.json.next_actions',
+      values: Array.isArray(caseData.next_actions) ? caseData.next_actions : [],
+      mode: 'next_action'
+    }
+  ];
+
+  groups.forEach(group => {
+    group.values.forEach((value, index) => {
+      const prefix = group.field === 'case.json.primary_blocker'
+        ? group.field
+        : `${group.field}[${index}]`;
+
+      extractCaseRefs(value).forEach(ref => {
+        if (ref.startsWith('T-')) {
+          const task = taskMap.get(ref);
+
+          if (!task) {
+            report.warn(`${prefix} references undefined task "${ref}".`);
+            return;
+          }
+
+          if (group.mode === 'blocker' && task.status === 'done') {
+            report.warn(`${prefix} references done task "${ref}".`);
+          }
+
+          if (group.mode === 'next_action' && task.status === 'done') {
+            report.warn(`${prefix} references done task "${ref}".`);
+          }
+
+          if (group.mode === 'next_action' && task.status === 'blocked') {
+            report.warn(`${prefix} references blocked task "${ref}".`);
+          }
+
+          return;
+        }
+
+        const question = questionMap.get(ref);
+
+        if (!question) {
+          report.warn(`${prefix} references undefined question "${ref}".`);
+          return;
+        }
+
+        if (group.mode === 'blocker' && question.status === 'resolved') {
+          report.warn(`${prefix} references resolved question "${ref}".`);
+        }
+
+        if (group.mode === 'next_action' && question.status === 'resolved') {
+          report.warn(`${prefix} references resolved question "${ref}".`);
+        }
+      });
+    });
+  });
+}
+
 function main() {
   const report = createReporter();
   const { caseData, stakeholders, questions, tasks, decisions, phases } = loadCaseFiles();
@@ -419,6 +511,7 @@ function main() {
   const taskIds = validateTasks(tasks, report);
   validateCrossReferences(tasks, taskIds, report);
   validateDecisions(decisions, questionIds, report);
+  validateCaseReferenceConsistency(caseData, buildIdMap(tasks), buildIdMap(questions), report);
 
   report.printAndExit();
 }
