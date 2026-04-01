@@ -1,5 +1,7 @@
 # case-starter
 
+![case-starter overview](docs/assets/case-starter-overview.png)
+
 会議メモ、メール、相談記録が散らばって、毎回「今どうなっているんだっけ」となる案件があります。  
 `case-starter` は、そういう曖昧で流動的な案件の現在地を、AI と人間が同じ認識で追えるようにするためのテンプレートです。
 
